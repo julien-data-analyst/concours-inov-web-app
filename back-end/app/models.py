@@ -2,6 +2,8 @@ from sqlalchemy import Column, Integer, String, Text, Date, ForeignKey, BigInteg
 from sqlalchemy.orm import relationship
 from sqlalchemy import Table
 from database import Base
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import select, func
 
 class Publisher(Base):
     __tablename__ = "publisher"
@@ -28,8 +30,34 @@ class Competition(Base):
 
     projects = relationship('Project',
                             backref='competition',
-                            lazy='dynamic')
+                            lazy='selectin') # dynamic <> selectin, l'un nous permet d'aller dans l'étape Query (Filtres, pagination, etcPeu) (Objet Query) 
+                                            # <> l'autre nous permet de récupérer directement la liste (list object) : privilégier pour de la performance
+    
+    # Version selectin
+    @hybrid_property
+    def project_count(self) -> int:
+        return len(self.projects) # On Compte le nombre de projets
 
+    @hybrid_property
+    def themes(self) -> list[str]:
+        return list({p.theme.theme for p in self.projects if p.theme}) # Le set est utilisé pour supprimer les doublons
+
+    @hybrid_property
+    def companies(self) -> list[str]:
+        return list({p.company.name for p in self.projects if p.company})
+    
+    # Pour avoir l'expression SQL
+    @companies.expression
+    def companies(cls):
+        from .models import Project, Company
+
+        return (
+            select(func.array_agg(func.distinct(Company.name)))
+            .where(Project.vague == cls.vague)
+            .join(Company, Project.id_comp == Company.id)
+            .scalar_subquery()
+        )
+    
 class Region(Base):
     __tablename__ = "region"
     
@@ -49,7 +77,7 @@ class Theme(Base):
 
     projects = relationship('Project', 
                         backref='theme', 
-                        lazy='dynamic')
+                        lazy='selectin')
     
 class Company(Base):
     __tablename__ = "company"
@@ -91,13 +119,15 @@ class Project(Base):
     month_dury = Column(Integer, nullable=True)
 
     id_them = Column(Integer,
-                     ForeignKey("theme.id"))
+                     ForeignKey("theme.id"),
+                     index=True)
     
     vague = Column(Integer,
                    ForeignKey('competition.vague'))
     
     id_comp = Column(Integer,
-                     ForeignKey('company.id'))
+                     ForeignKey('company.id'),
+                     index=True)
     
 ##############################
 # ---- Création des tables d'associations (*-*) ----
