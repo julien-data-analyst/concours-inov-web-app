@@ -146,13 +146,6 @@ class Company(Base):
             proj.theme.general_theme
             for proj in self.projects
             })
-
-    # @hybrid_property
-    # def project_details(self):
-    #     return [
-    #     ProjectBase.model_validate(proj).model_dump()
-    #     for proj in self.projects
-    # ]
     
 class Department(Base):
     __tablename__ = "department"

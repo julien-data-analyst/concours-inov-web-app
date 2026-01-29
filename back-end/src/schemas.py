@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 import datetime
+from typing import Optional
 
 # Base schema with common attributes
 class PublisherBase(BaseModel):
@@ -56,7 +57,6 @@ class ThemeBase(BaseModel):
 
 # Schema for reading/returning an item (includes id)
 class Theme(ThemeBase):
-    id: int
 
     class Config:
         orm_mode = True
@@ -79,11 +79,19 @@ class Department(DepartmentBase):
 
 # Base schema with common attributes
 class ProjectBase(BaseModel):
+    id: int
     name: str
-
+    pdf_page: int
+    description: Optional[str] = None
+    project_amount: Optional[int] = None
+    project_allowance: Optional[int] = None
+    beginning_year: Optional[int] = None
+    ending_year: Optional[int] = None
+    month_dury: Optional[int] = None
+    
 # Schema for reading/returning an item (includes id)
 class Project(ProjectBase):
-    id: int
+    theme: Theme
 
     class Config:
         #from_attributes = True
@@ -98,7 +106,7 @@ class CompanyBase(BaseModel):
 class Company(CompanyBase):
     regions_dep_list: dict
     themes_list: list
-    project_details: list
+    projects: list[Project]
 
     class Config:
         orm_mode = True

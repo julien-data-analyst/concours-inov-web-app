@@ -14,7 +14,7 @@ app = FastAPI()
 # Add CORS middleware to allow React frontend to connect
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React's default port
+    allow_origins=["http://localhost:5173"],  # React's default port
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
@@ -98,3 +98,13 @@ def read_items(db: Session = Depends(get_db)):
                  .all())
     
     return companies
+
+# READ - Get all publishers
+@app.get("/projects/", response_model=list[src.schemas.Project])
+async def read_items(db: Session = Depends(get_db)):
+    
+    projects = db.query(src.models.Project).options(
+        selectinload(src.models.Project.theme)
+    ).all()
+
+    return projects
