@@ -1,9 +1,10 @@
 from sqlalchemy import Column, Integer, String, Text, Date, ForeignKey, BigInteger
 from sqlalchemy.orm import relationship
 from sqlalchemy import Table
-from database import Base
+from src.database import Base
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import select, func
+from src.schemas import ProjectBase
 
 class Publisher(Base):
     __tablename__ = "publisher"
@@ -15,7 +16,11 @@ class Publisher(Base):
     competitions = relationship('Competition',
                                 secondary="competition_publisher",
                                 backref='publisher',
-                                lazy="dynamic")
+                                lazy="selectin")
+    
+    @hybrid_property
+    def competitions_participated(self) -> list:
+        return [c.vague for c in self.competitions]
     
 class Competition(Base):
     __tablename__ = "competition"
@@ -66,7 +71,39 @@ class Region(Base):
 
     deps = relationship('Department', 
                         backref='region', 
-                        lazy='dynamic')
+                        lazy='selectin')
+    
+    @hybrid_property
+    def listdeps(self) -> list:
+        return [[d.name, d.dep_number] for d in self.deps]
+    
+    @hybrid_property
+    def project_count(self) -> int:
+        return sum([len(d.projects) for d in self.deps])
+            
+    @hybrid_property
+    def vague_participated(self) -> list[int]:
+        return list({
+        proj.vague
+        for dep in self.deps
+        for proj in dep.projects
+        })
+
+    @hybrid_property
+    def themes(self) -> list[str]:
+        return list({
+        proj.theme.theme
+        for dep in self.deps
+        for proj in dep.projects
+        })
+
+    @hybrid_property
+    def themes_gen(self) -> list[str]:
+        return list({
+        proj.theme.general_theme
+        for dep in self.deps
+        for proj in dep.projects
+        })
     
 class Theme(Base):
     __tablename__ = "theme"
@@ -88,7 +125,34 @@ class Company(Base):
 
     projects = relationship('Project', 
                         backref='company', 
-                        lazy='dynamic')
+                        lazy='selectin')
+    
+    @hybrid_property
+    def regions_dep_list(self):
+        dict_regions_dep = {}
+
+        for p in self.projects:
+            for d in p.department:
+                if not d.region.name in dict_regions_dep:
+                    dict_regions_dep[d.region.name] = [d.name]
+                else:
+                    dict_regions_dep[d.region.name].append(d.name)
+        
+        return dict_regions_dep
+    
+    @hybrid_property
+    def themes_list(self):
+        return list({
+            proj.theme.general_theme
+            for proj in self.projects
+            })
+
+    # @hybrid_property
+    # def project_details(self):
+    #     return [
+    #     ProjectBase.model_validate(proj).model_dump()
+    #     for proj in self.projects
+    # ]
     
 class Department(Base):
     __tablename__ = "department"
@@ -103,7 +167,32 @@ class Department(Base):
     projects = relationship('Project',
                             secondary='location',
                             backref='department',
-                            lazy='dynamic')
+                            lazy='selectin')
+    
+    @hybrid_property
+    def project_count(self) -> int:
+        return len(self.projects)
+            
+    @hybrid_property
+    def vague_participated(self) -> list[int]:
+        return list({
+        proj.vague
+        for proj in self.projects
+        })
+
+    @hybrid_property
+    def themes(self) -> list[str]:
+        return list({
+        proj.theme.theme
+        for proj in self.projects
+        })
+
+    @hybrid_property
+    def themes_gen(self) -> list[str]:
+        return list({
+        proj.theme.general_theme
+        for proj in self.projects
+        })
     
 class Project(Base):
     __tablename__ = "project"

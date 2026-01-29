@@ -5,6 +5,7 @@ import datetime
 class PublisherBase(BaseModel):
     name: str
     web_url: str = ""
+    competitions_participated: list[int]
 
 # Schema for reading/returning an item (includes id)
 class Publisher(PublisherBase):
@@ -39,7 +40,11 @@ class RegionBase(BaseModel):
 
 # Schema for reading/returning an item (includes id)
 class Region(RegionBase):
-    id: int
+    listdeps: list
+    project_count: int
+    vague_participated: list[int]
+    themes: list
+    themes_gen: list
 
     class Config:
         orm_mode = True
@@ -64,7 +69,11 @@ class DepartmentBase(BaseModel):
 # Schema for reading/returning an item (includes id)
 class Department(DepartmentBase):
     id: int
-
+    project_count: int
+    vague_participated: list[int]
+    themes: list
+    themes_gen: list
+    
     class Config:
         orm_mode = True
 
@@ -77,6 +86,7 @@ class Project(ProjectBase):
     id: int
 
     class Config:
+        #from_attributes = True
         orm_mode = True
 
 # Base schema with common attributes
@@ -86,7 +96,9 @@ class CompanyBase(BaseModel):
 
 # Schema for reading/returning an item (includes id)
 class Company(CompanyBase):
-    id: int
+    regions_dep_list: dict
+    themes_list: list
+    project_details: list
 
     class Config:
         orm_mode = True
