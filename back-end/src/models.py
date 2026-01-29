@@ -116,6 +116,10 @@ class Theme(Base):
                         backref='theme', 
                         lazy='selectin')
     
+    @hybrid_property
+    def project_count(self) -> int:
+        return len(self.projects)
+        
 class Company(Base):
     __tablename__ = "company"
     

@@ -42,7 +42,7 @@ const ProjectsList = () => {
       <h2>Projects List</h2>
       <ul>
         {projects.map((project) => (
-          <li key={project.id}>{project.name} / {project.beginning_year} - {project.ending_year}</li>
+          <li key={project.id}>{project.name} / {project.beginning_year} - {project.ending_year} / {project.month_dury}</li>
         ))}
       </ul>
     </div>

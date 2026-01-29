@@ -108,3 +108,23 @@ async def read_items(db: Session = Depends(get_db)):
     ).all()
 
     return projects
+
+# READ - Get all publishers
+@app.get("/themes/", response_model=list[src.schemas.Theme])
+async def read_items(db: Session = Depends(get_db)):
+    
+    themes = db.query(src.models.Theme).options(
+        selectinload(src.models.Theme.projects)
+    ).all()
+
+    return themes
+
+# READ - Get all publishers
+@app.get("/general_theme/", response_model=list[src.schemas.Theme])
+async def read_items(db: Session = Depends(get_db)):
+    
+    themes = db.query(src.models.Theme).options(
+        selectinload(src.models.Theme.projects)
+    )
+
+    return themes

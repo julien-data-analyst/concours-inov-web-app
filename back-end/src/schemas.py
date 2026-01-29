@@ -57,7 +57,8 @@ class ThemeBase(BaseModel):
 
 # Schema for reading/returning an item (includes id)
 class Theme(ThemeBase):
-
+    project_count: int
+    
     class Config:
         orm_mode = True
 
