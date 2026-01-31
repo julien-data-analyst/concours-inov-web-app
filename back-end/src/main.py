@@ -30,7 +30,7 @@ def get_db():
 
 # READ - Get all publishers
 @app.get("/publishers/", response_model=list[src.schemas.Publisher])
-def read_items(db: Session = Depends(get_db)):
+def read_publishers(db: Session = Depends(get_db)):
     
     publishers = db.query(src.models.Publisher).options(
         selectinload(src.models.Publisher.competitions)
@@ -40,7 +40,7 @@ def read_items(db: Session = Depends(get_db)):
 
 # READ - Get all competitions
 @app.get("/competitions/", response_model=list[src.schemas.Competition])
-def read_items(db: Session = Depends(get_db)):
+def read_competitions(db: Session = Depends(get_db)):
 
     competitions = (
         db.query(src.models.Competition)
@@ -58,7 +58,7 @@ def read_items(db: Session = Depends(get_db)):
 
 # READ - Get all regions
 @app.get("/regions/", response_model=list[src.schemas.Region])
-def read_items(db: Session = Depends(get_db)):
+def read_regions(db: Session = Depends(get_db)):
     regions = (
     db.query(src.models.Region)
     .options(
@@ -72,7 +72,7 @@ def read_items(db: Session = Depends(get_db)):
 
 # READ - Get all departments
 @app.get("/departments/", response_model=list[src.schemas.Department])
-def read_items(db: Session = Depends(get_db)):
+def read_departments(db: Session = Depends(get_db)):
     regions = (
     db.query(src.models.Department)
     .options(
@@ -85,7 +85,7 @@ def read_items(db: Session = Depends(get_db)):
 
 # READ - Get all company
 @app.get("/companies/", response_model=list[src.schemas.Company])
-def read_items(db: Session = Depends(get_db)):
+def read_companies(db: Session = Depends(get_db)):
     companies = (db.query(src.models.Company)
                  .options(
                      selectinload(src.models.Company.projects)
@@ -99,19 +99,23 @@ def read_items(db: Session = Depends(get_db)):
     
     return companies
 
-# READ - Get all publishers
+# READ - Get all projects with details
 @app.get("/projects/", response_model=list[src.schemas.Project])
-async def read_items(db: Session = Depends(get_db)):
+async def read_projects(db: Session = Depends(get_db)):
     
     projects = db.query(src.models.Project).options(
-        selectinload(src.models.Project.theme)
+        selectinload(src.models.Project.theme),
+        selectinload(src.models.Project.company),
+        selectinload(src.models.Project.department)
+        .joinedload(src.models.Department.region),
+        selectinload(src.models.Project.competition)
     ).all()
 
     return projects
 
 # READ - Get all publishers
 @app.get("/themes/", response_model=list[src.schemas.Theme])
-async def read_items(db: Session = Depends(get_db)):
+async def read_themes(db: Session = Depends(get_db)):
     
     themes = db.query(src.models.Theme).options(
         selectinload(src.models.Theme.projects)
@@ -120,11 +124,11 @@ async def read_items(db: Session = Depends(get_db)):
     return themes
 
 # READ - Get all publishers
-@app.get("/general_theme/", response_model=list[src.schemas.Theme])
-async def read_items(db: Session = Depends(get_db)):
+# @app.get("/general_theme/", response_model=list[src.schemas.Theme])
+# async def read_items(db: Session = Depends(get_db)):
     
-    themes = db.query(src.models.Theme).options(
-        selectinload(src.models.Theme.projects)
-    )
+#     themes = db.query(src.models.Theme).options(
+#         selectinload(src.models.Theme.projects)
+#     )
 
-    return themes
+#     return themes

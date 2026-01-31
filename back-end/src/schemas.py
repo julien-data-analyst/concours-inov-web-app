@@ -13,27 +13,25 @@ class Publisher(PublisherBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Base schema with common attributes
 class CompetitionBase(BaseModel):
-    vague: int
-    description: str = ""
     web_url: str = ""
     pdf_url: str = ""
-    description: str = ""
-    presentation: str=""
     parution: datetime.datetime
 
 # Schema for reading/returning an item (includes id)
 class Competition(CompetitionBase):
     vague: int
     project_count: int
+    description: str = ""
+    presentation: str=""
     themes: list[str]
     companies: list[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Base schema with common attributes
 class RegionBase(BaseModel):
@@ -48,7 +46,7 @@ class Region(RegionBase):
     themes_gen: list
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Base schema with common attributes
 class ThemeBase(BaseModel):
@@ -60,7 +58,7 @@ class Theme(ThemeBase):
     project_count: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Base schema with common attributes
 class DepartmentBase(BaseModel):
@@ -76,13 +74,18 @@ class Department(DepartmentBase):
     themes_gen: list
     
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+# Base schema with common attributes
+class CompanyBase(BaseModel):
+    name: str
+    activity: str
 
 # Base schema with common attributes
 class ProjectBase(BaseModel):
-    id: int
     name: str
     pdf_page: int
+    vague: int
     description: Optional[str] = None
     project_amount: Optional[int] = None
     project_allowance: Optional[int] = None
@@ -92,22 +95,21 @@ class ProjectBase(BaseModel):
     
 # Schema for reading/returning an item (includes id)
 class Project(ProjectBase):
-    theme: Theme
-
+    id: int
+    theme: ThemeBase
+    company: CompanyBase
+    dict_regions_deps: dict
+    competition: CompetitionBase
+    
     class Config:
-        #from_attributes = True
-        orm_mode = True
-
-# Base schema with common attributes
-class CompanyBase(BaseModel):
-    name: str
-    activity: str
+        from_attributes = True
 
 # Schema for reading/returning an item (includes id)
 class Company(CompanyBase):
     regions_dep_list: dict
     themes_list: list
     projects: list[Project]
-
+    
     class Config:
-        orm_mode = True
+        from_attributes = True
+

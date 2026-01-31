@@ -4,7 +4,6 @@ from sqlalchemy import Table
 from src.database import Base
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import select, func
-from src.schemas import ProjectBase
 
 class Publisher(Base):
     __tablename__ = "publisher"
@@ -214,6 +213,18 @@ class Project(Base):
     id_comp = Column(Integer,
                      ForeignKey('company.id'),
                      index=True)
+    
+    @hybrid_property
+    def dict_regions_deps(self):
+        dict_reg_deps = {}
+
+        for dep in self.department:
+                if not dep.region.name in dict_reg_deps:
+                    dict_reg_deps[dep.region.name] = [dep.name]
+                else:
+                    dict_reg_deps[dep.region.name].append(dep.name)
+
+        return dict_reg_deps
     
 ##############################
 # ---- Création des tables d'associations (*-*) ----

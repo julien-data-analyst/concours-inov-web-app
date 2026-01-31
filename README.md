@@ -4,7 +4,15 @@ This is the repository for the web app on the Inov Competition created by the fr
 
 The stack that is used is :
 - Python : FastAPI for the backend, SQLAlchemy for communicate with the PostGreSQL
-- HTML, CSS, JS : base stack to develop web pages
-- React : for the front-end to create web pages
-- Chart.js : to create the graphic visualization 
+- HTML, CSS, JS : base stack to develop web pages with library like Bootstrap or Chart.js
+- React : for the front-end to create web pages (framework : vite)
 
+The app will be composed of five pages :
+- Home : present what is the goal of this competition
+- Projects : present all the projects that was made this far from all competitions with possibility to filter by many modalities
+- Project/{id_proj} : present the project selected from the user in the Projects/Favourites pages 
+- Favourites : the one that you put into favourites
+- Dashboard : will represent graphics visualization and metrics to analyze these competitions
+- API : to use the API to get the Data from the Database (FastAPI docs and more)
+
+if you want to run it for yourself, it's still being made so you gotta wait for that.
